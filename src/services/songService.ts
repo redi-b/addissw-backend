@@ -1,4 +1,4 @@
-import { CreateSongInput } from "@/types/song";
+import { CreateSongInput } from "../types/song";
 import { PrismaClient, Song } from "../../generated/prisma";
 
 const prisma = new PrismaClient();

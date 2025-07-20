@@ -5,7 +5,7 @@ import {
   getSongById,
   updateSong,
   deleteSong,
-} from "@/controllers/songController";
+} from "../controllers/songController";
 
 const router = Router();
 

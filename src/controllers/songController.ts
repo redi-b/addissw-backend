@@ -1,8 +1,8 @@
 import { Request, Response } from "express";
 import { z } from "zod";
 
-import { CreateSongSchema, UpdateSongSchema } from "@/validators/songValidator";
-import * as SongService from "@/services/songService";
+import { CreateSongSchema, UpdateSongSchema } from "../validators/songValidator";
+import * as SongService from "../services/songService";
 
 // Create a new song
 export async function createSong(req: Request, res: Response) {

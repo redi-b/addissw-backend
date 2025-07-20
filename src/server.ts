@@ -2,7 +2,7 @@ import express from "express";
 import cors from "cors";
 import dotenv from "dotenv";
 
-import songRouter from "@/routes/songRoutes";
+import songRouter from "./routes/songRoutes";
 import { errorHandler } from "./middlewares/errors";
 
 dotenv.config();
