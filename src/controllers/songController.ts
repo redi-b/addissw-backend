@@ -3,6 +3,7 @@ import { z } from "zod";
 
 import { CreateSongSchema, UpdateSongSchema } from "../validators/songValidator";
 import * as SongService from "../services/songService";
+import { Prisma } from "generated/prisma";
 
 // Create a new song
 export async function createSong(req: Request, res: Response) {
@@ -13,6 +14,13 @@ export async function createSong(req: Request, res: Response) {
   } catch (err) {
     if (err instanceof z.ZodError) {
       return res.status(400).json({ message: err.message });
+    }
+    if (err instanceof Prisma.PrismaClientKnownRequestError) {
+      if (err.code === "P2002") {
+        return res.status(409).json({
+          message: "A song with this title and artist already exists.",
+        });
+      }
     }
     console.error(err);
     return res.status(500).json({ message: "Server error" });
@@ -85,5 +93,18 @@ export async function deleteSong(req: Request, res: Response) {
   } catch (err) {
     console.error(err);
     return res.status(500).json({ message: "Server error" });
+  }
+}
+
+export async function seedSongsIfEmpty(req: Request, res: Response) {
+  try {
+    const seededCount = await SongService.seedSongsIfEmpty();
+    if (seededCount === 0) {
+      return res.status(400).json({ message: "Songs already exist. Skipping seeding." });
+    }
+    return res.json({ message: `Seeded ${seededCount} songs successfully.` });
+  } catch (err) {
+    console.error(err);
+    return res.status(500).json({ message: "Failed to seed songs." });
   }
 }

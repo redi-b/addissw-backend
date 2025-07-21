@@ -18,4 +18,6 @@ model Song {
   album  String?
   year   Int?
   createdAt DateTime @default(now())
+
+  @@unique([title, artist])
 }

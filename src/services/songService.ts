@@ -1,5 +1,6 @@
 import { CreateSongInput } from "../types/song";
 import { PrismaClient, Song } from "../../generated/prisma";
+import { seedData } from "../seed/songs";
 
 const prisma = new PrismaClient();
 
@@ -88,3 +89,15 @@ export const deleteSong = async (id: number): Promise<Song | null> => {
     throw error;
   }
 };
+
+// Seed songs if the database is empty
+export async function seedSongsIfEmpty(): Promise<number> {
+  const existing = await prisma.song.count();
+  if (existing > 0) return 0;
+
+  await prisma.song.createMany({
+    data: seedData,
+  });
+
+  return seedData.length;
+}

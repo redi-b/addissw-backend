@@ -5,6 +5,7 @@ import {
   getSongById,
   updateSong,
   deleteSong,
+  seedSongsIfEmpty,
 } from "../controllers/songController";
 
 const router = Router();
@@ -23,5 +24,8 @@ router.put("/:id", updateSong);
 
 // Delete a song by ID
 router.delete("/:id", deleteSong);
+
+// Seed songs if the database is empty
+router.post("/seed", seedSongsIfEmpty)
 
 export default router;

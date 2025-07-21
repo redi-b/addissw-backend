@@ -16,7 +16,8 @@
   "main": "server.js",
   "scripts": {
     "dev": "ts-node-dev --respawn --transpile-only --require tsconfig-paths/register src/server.ts",
-    "build": "tsc",
+    "build": "prisma migrate deploy && tsc",
+    "postinstall": "prisma generate",
     "start": "node dist/server.js"
   },
   "devDependencies": {
