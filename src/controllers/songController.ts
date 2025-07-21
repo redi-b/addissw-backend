@@ -23,7 +23,7 @@ export async function createSong(req: Request, res: Response) {
 export async function getAllSongs(req: Request, res: Response) {
   try {
     const page = Number(req.query.page) || 1;
-    const pageSize = Number(req.query.pageSize) || 10;
+    const pageSize = Number(req.query.pageSize) || 5;
 
     if (page < 1 || pageSize < 1)
       return res.status(400).json({ message: "Invalid pagination parameters" });
