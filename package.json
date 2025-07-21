@@ -17,6 +17,7 @@
   "scripts": {
     "dev": "ts-node-dev --respawn --transpile-only --require tsconfig-paths/register src/server.ts",
     "build": "tsc",
+    "heroku-postbuild": "prisma generate && prisma migrate deploy",
     "start": "node dist/server.js"
   },
   "devDependencies": {
