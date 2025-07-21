@@ -3,7 +3,7 @@ import { z } from "zod";
 
 import { CreateSongSchema, UpdateSongSchema } from "../validators/songValidator";
 import * as SongService from "../services/songService";
-import { Prisma } from "../../generated/prisma";
+import { Prisma } from "@prisma/client";
 
 // Create a new song
 export async function createSong(req: Request, res: Response) {

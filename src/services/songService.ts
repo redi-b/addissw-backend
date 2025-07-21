@@ -1,6 +1,7 @@
 import { CreateSongInput } from "../types/song";
-import { PrismaClient, Song } from "../../generated/prisma";
 import { seedData } from "../seed/songs";
+
+import { PrismaClient, Song } from "@prisma/client";
 
 const prisma = new PrismaClient();
 
