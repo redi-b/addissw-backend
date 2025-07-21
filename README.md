@@ -36,6 +36,7 @@ A lightweight REST API built with Node.js and Express to manage songs for the Ad
 | GET    | `/`               | Get paginated list of songs     |
 | GET    | `/:id`            | Get a single song by ID         |
 | POST   | `/`               | Create a new song               |
+| POST   | `/seed`           | Seed database with songs        |
 | PUT    | `/:id`            | Update a song by ID             |
 | DELETE | `/:id`            | Delete a song by ID             |
 
