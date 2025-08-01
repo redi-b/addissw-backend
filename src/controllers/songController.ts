@@ -1,15 +1,23 @@
-import { Request, Response } from "express";
+import { Response } from "express";
 import { z } from "zod";
 
-import { CreateSongSchema, UpdateSongSchema } from "../validators/songValidator";
+import {
+  CreateSongSchema,
+  UpdateSongSchema,
+} from "../validators/songValidator";
 import * as SongService from "../services/songService";
 import { Prisma } from "@prisma/client";
+import { AuthRequest } from "@/middlewares/auth";
 
 // Create a new song
-export async function createSong(req: Request, res: Response) {
+export async function createSong(req: AuthRequest, res: Response) {
+  if (!req.user) {
+    return res.status(401).json({ message: "Unauthorized" });
+  }
+
   try {
     const data = CreateSongSchema.parse(req.body);
-    const song = await SongService.createSong(data);
+    const song = await SongService.createSong({ ...data, userId: req.user.id });
     return res.status(201).json(song);
   } catch (err) {
     if (err instanceof z.ZodError) {
@@ -28,7 +36,11 @@ export async function createSong(req: Request, res: Response) {
 }
 
 // Get paginated songs
-export async function getAllSongs(req: Request, res: Response) {
+export async function getAllSongs(req: AuthRequest, res: Response) {
+  if (!req.user) {
+    return res.status(401).json({ message: "Unauthorized" });
+  }
+
   try {
     const page = Number(req.query.page) || 1;
     const pageSize = Number(req.query.pageSize) || 5;
@@ -36,8 +48,8 @@ export async function getAllSongs(req: Request, res: Response) {
     if (page < 1 || pageSize < 1)
       return res.status(400).json({ message: "Invalid pagination parameters" });
 
-    const result = await SongService.getSongs(page, pageSize);
-    return res.json(result); // returns { songs, total }
+    const result = await SongService.getSongs(req.user.id, page, pageSize);
+    return res.json(result);
   } catch (err) {
     console.error(err);
     return res.status(500).json({ message: "Server error" });
@@ -45,13 +57,20 @@ export async function getAllSongs(req: Request, res: Response) {
 }
 
 // Get a single song by ID
-export async function getSongById(req: Request, res: Response) {
+export async function getSongById(req: AuthRequest, res: Response) {
+  if (!req.user) {
+    return res.status(401).json({ message: "Unauthorized" });
+  }
+  
   try {
     const id = Number(req.params.id);
     if (isNaN(id)) return res.status(400).json({ message: "Invalid song ID" });
 
     const song = await SongService.getSongById(id);
     if (!song) return res.status(404).json({ message: "Song not found" });
+    if (song.userId !== req.user.id) {
+      return res.status(403).json({ message: "Forbidden" });
+    }
 
     return res.json(song);
   } catch (err) {
@@ -61,14 +80,25 @@ export async function getSongById(req: Request, res: Response) {
 }
 
 // Update a song by ID
-export async function updateSong(req: Request, res: Response) {
+export async function updateSong(req: AuthRequest, res: Response) {
+  if (!req.user) {
+    return res.status(401).json({ message: "Unauthorized" });
+  }
+
   try {
     const id = Number(req.params.id);
     if (isNaN(id)) return res.status(400).json({ message: "Invalid song ID" });
 
+    const song = await SongService.getSongById(id);
+    if (!song) return res.status(404).json({ message: "Song not found" });
+
+    if (song.userId !== req.user.id) {
+      return res.status(403).json({ message: "Forbidden" });
+    }
+
     const data = UpdateSongSchema.parse(req.body);
     const updated = await SongService.updateSong(id, data);
-    if (!updated) return res.status(404).json({ message: "Song not found" });
+    if (!updated) return res.status(500).json({ message: "Error updating song" });
 
     return res.json(updated);
   } catch (err) {
@@ -81,13 +111,24 @@ export async function updateSong(req: Request, res: Response) {
 }
 
 // Delete a song by ID
-export async function deleteSong(req: Request, res: Response) {
+export async function deleteSong(req: AuthRequest, res: Response) {
+  if (!req.user) {
+    return res.status(401).json({ message: "Unauthorized" });
+  }
+
   try {
     const id = Number(req.params.id);
     if (isNaN(id)) return res.status(400).json({ message: "Invalid song ID" });
 
+    const song = await SongService.getSongById(id);
+    if (!song) return res.status(404).json({ message: "Song not found" });
+
+    if (song.userId !== req.user.id) {
+      return res.status(403).json({ message: "Forbidden" });
+    }
+
     const deleted = await SongService.deleteSong(id);
-    if (!deleted) return res.status(404).json({ message: "Song not found" });
+    if (!deleted) return res.status(500).json({ message: "Error deleting song" });
 
     return res.json({ message: "Song deleted successfully" });
   } catch (err) {
@@ -96,11 +137,17 @@ export async function deleteSong(req: Request, res: Response) {
   }
 }
 
-export async function seedSongsIfEmpty(req: Request, res: Response) {
+export async function seedSongsIfEmpty(req: AuthRequest, res: Response) {
+  if (!req.user) {
+    return res.status(401).json({ message: "Unauthorized" });
+  }
+  
   try {
-    const seededCount = await SongService.seedSongsIfEmpty();
+    const seededCount = await SongService.seedSongsIfEmpty(req.user.id);
     if (seededCount === 0) {
-      return res.status(400).json({ message: "Songs already exist. Skipping seeding." });
+      return res
+        .status(400)
+        .json({ message: "Songs already exist. Skipping seeding." });
     }
     return res.json({ message: `Seeded ${seededCount} songs successfully.` });
   } catch (err) {

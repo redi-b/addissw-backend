@@ -1,4 +1,4 @@
-import { CreateSongInput } from "../types/song";
+import { CreateSongInput } from "../types";
 import { seedData } from "../seed/songs";
 
 import { PrismaClient, Song } from "@prisma/client";
@@ -6,7 +6,9 @@ import { PrismaClient, Song } from "@prisma/client";
 const prisma = new PrismaClient();
 
 // Create a new song
-export const createSong = async (data: CreateSongInput): Promise<Song> => {
+export const createSong = async (
+  data: CreateSongInput & { userId: string }
+): Promise<Song> => {
   try {
     const song = await prisma.song.create({
       data: {
@@ -14,6 +16,7 @@ export const createSong = async (data: CreateSongInput): Promise<Song> => {
         artist: data.artist,
         album: data.album,
         year: data.year,
+        userId: data.userId,
       },
     });
     return song;
@@ -25,6 +28,7 @@ export const createSong = async (data: CreateSongInput): Promise<Song> => {
 
 // Get songs with pagination
 export const getSongs = async (
+  userId: string,
   page = 1,
   pageSize = 10
 ): Promise<{
@@ -34,8 +38,8 @@ export const getSongs = async (
   try {
     const skip = (page - 1) * pageSize;
     const [songs, total] = await Promise.all([
-      prisma.song.findMany({ skip, take: pageSize }),
-      prisma.song.count(),
+      prisma.song.findMany({ where: { userId }, skip, take: pageSize }),
+      prisma.song.count({ where: { userId } }),
     ]);
     return { songs, total };
   } catch (error) {
@@ -92,12 +96,12 @@ export const deleteSong = async (id: number): Promise<Song | null> => {
 };
 
 // Seed songs if the database is empty
-export async function seedSongsIfEmpty(): Promise<number> {
+export async function seedSongsIfEmpty(userId: string): Promise<number> {
   const existing = await prisma.song.count();
   if (existing > 0) return 0;
 
   await prisma.song.createMany({
-    data: seedData,
+    data: seedData.map((song) => ({ ...song, userId })),
   });
 
   return seedData.length;
