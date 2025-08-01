@@ -1,4 +1,4 @@
-import { CreateSongInput } from "../types/song";
+import { CreateSongInput } from "../types";
 
 export const seedData: CreateSongInput[] = [
   {
