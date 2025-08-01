@@ -7,7 +7,7 @@ import {
 } from "../validators/songValidator";
 import * as SongService from "../services/songService";
 import { Prisma } from "@prisma/client";
-import { AuthRequest } from "@/middlewares/auth";
+import { AuthRequest } from "../middlewares/auth";
 
 // Create a new song
 export async function createSong(req: AuthRequest, res: Response) {

@@ -7,7 +7,7 @@ import {
   deleteSong,
   seedSongsIfEmpty,
 } from "../controllers/songController";
-import { authenticate } from "@/middlewares/auth";
+import { authenticate } from "../middlewares/auth";
 
 const router = Router();
 

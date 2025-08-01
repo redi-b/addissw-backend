@@ -5,7 +5,7 @@ import {
   signOut,
   signUp,
 } from "../controllers/authController";
-import { authenticate } from "@/middlewares/auth";
+import { authenticate } from "../middlewares/auth";
 
 const router = Router();
 
