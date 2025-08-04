@@ -1,9 +1,9 @@
 import { CreateSongInput } from "../types";
 import { seedData } from "../seed/songs";
 
-import { PrismaClient, Song } from "@prisma/client";
+import { Song } from "@prisma/client";
 
-const prisma = new PrismaClient();
+import prisma from "../lib";
 
 // Create a new song
 export const createSong = async (
