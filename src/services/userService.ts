@@ -1,7 +1,7 @@
 import { UserInput } from "../types";
-import { PrismaClient, User } from "@prisma/client";
+import { User } from "@prisma/client";
 
-const prisma = new PrismaClient();
+import prisma from "../lib";
 
 // Create a new User
 export const createUser = async (data: UserInput): Promise<User> => {

@@ -63,8 +63,8 @@ export async function getSongById(req: AuthRequest, res: Response) {
   }
   
   try {
-    const id = Number(req.params.id);
-    if (isNaN(id)) return res.status(400).json({ message: "Invalid song ID" });
+    const id = req.params.id;
+    if (!id) return res.status(400).json({ message: "Invalid song ID" });
 
     const song = await SongService.getSongById(id);
     if (!song) return res.status(404).json({ message: "Song not found" });
@@ -86,8 +86,8 @@ export async function updateSong(req: AuthRequest, res: Response) {
   }
 
   try {
-    const id = Number(req.params.id);
-    if (isNaN(id)) return res.status(400).json({ message: "Invalid song ID" });
+    const id = req.params.id;
+    if (!id) return res.status(400).json({ message: "Invalid song ID" });
 
     const song = await SongService.getSongById(id);
     if (!song) return res.status(404).json({ message: "Song not found" });
@@ -117,8 +117,8 @@ export async function deleteSong(req: AuthRequest, res: Response) {
   }
 
   try {
-    const id = Number(req.params.id);
-    if (isNaN(id)) return res.status(400).json({ message: "Invalid song ID" });
+    const id = req.params.id;
+    if (!id) return res.status(400).json({ message: "Invalid song ID" });
 
     const song = await SongService.getSongById(id);
     if (!song) return res.status(404).json({ message: "Song not found" });

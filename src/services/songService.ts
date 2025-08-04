@@ -1,9 +1,8 @@
 import { CreateSongInput } from "../types";
 import { seedData } from "../seed/songs";
 
-import { PrismaClient, Song } from "@prisma/client";
-
-const prisma = new PrismaClient();
+import { Song } from "@prisma/client";
+import prisma from "../lib"
 
 // Create a new song
 export const createSong = async (
@@ -49,7 +48,7 @@ export const getSongs = async (
 };
 
 // Get a single song by ID
-export const getSongById = async (id: number): Promise<Song | null> => {
+export const getSongById = async (id: string): Promise<Song | null> => {
   try {
     return await prisma.song.findUnique({ where: { id } });
   } catch (error) {
@@ -60,7 +59,7 @@ export const getSongById = async (id: number): Promise<Song | null> => {
 
 // Update a song
 export const updateSong = async (
-  id: number,
+  id: string,
   updates: {
     title?: string;
     artist?: string;
@@ -86,7 +85,7 @@ export const updateSong = async (
 };
 
 // Delete a song
-export const deleteSong = async (id: number): Promise<Song | null> => {
+export const deleteSong = async (id: string): Promise<Song | null> => {
   try {
     return await prisma.song.delete({ where: { id } });
   } catch (error) {
