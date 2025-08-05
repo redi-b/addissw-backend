@@ -19,16 +19,12 @@ COPY --from=builder /app/package*.json ./
 RUN npm install --omit=dev
 
 COPY --from=builder /app/dist ./dist
-COPY --from=builder /app/prisma ./prisma
 COPY --from=builder /app/docker-entrypoint.sh ./docker-entrypoint.sh
 RUN chmod +x ./docker-entrypoint.sh
 
-ARG DATABASE_URL=mongodb://127.0.0.1:27017/songMananger
+ARG DATABASE_URL=mongodb://127.0.0.1:27017/song-mananger
 ENV DATABASE_URL=${DATABASE_URL}
 ENV NODE_ENV=production
-
-RUN npx prisma generate
-RUN npx prisma db push
 
 EXPOSE 3030
 

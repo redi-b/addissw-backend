@@ -6,6 +6,7 @@ import cookieParser from "cookie-parser";
 import songRouter from "./routes/songRoutes";
 import authRouter from "./routes/authRoutes";
 import { errorHandler } from "./middlewares/errors";
+import { connectToDatabase } from "./db";
 
 dotenv.config();
 
@@ -16,7 +17,7 @@ app.use(cookieParser());
 app.use(
   cors({
     origin: process.env.CLIENT_URL,
-    credentials: true
+    credentials: true,
   })
 );
 app.use(express.json());
@@ -26,10 +27,16 @@ app.use("/api/auth", authRouter);
 
 app.use(errorHandler);
 
-app.listen(port, (err: any) => {
-  if (err) {
-    console.error("Error starting server:", err);
-  } else {
-    console.log(`Server is running on http://localhost:${port}`);
-  }
-});
+const startServer = async () => {
+  await connectToDatabase();
+
+  app.listen(port, async (err: any) => {
+    if (err) {
+      console.error("Error starting server:", err);
+    } else {
+      console.log(`Server is running on http://localhost:${port}`);
+    }
+  });
+};
+
+startServer()

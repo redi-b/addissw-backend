@@ -3,7 +3,6 @@ import { ZodError } from "zod";
 
 import { UserSchema } from "../validators/userValidator";
 import * as UserService from "../services/userService";
-import { Prisma } from "@prisma/client";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 import { serialize } from "cookie";
@@ -22,7 +21,7 @@ export const signUp = async (req: Request, res: Response) => {
       username: user.username,
       createdAt: user.createdAt,
     });
-  } catch (err) {
+  } catch (err: any) {
     if (err instanceof ZodError) {
       const errors = err.issues.map((e) => ({
         field: e.path.join("."),
@@ -33,12 +32,10 @@ export const signUp = async (req: Request, res: Response) => {
         errors,
       });
     }
-    if (err instanceof Prisma.PrismaClientKnownRequestError) {
-      if (err.code === "P2002") {
-        return res.status(409).json({
-          message: "A user with this username already exists.",
-        });
-      }
+    if (err.name === "MongoServerError" && err.code === 11000) {
+      return res.status(409).json({
+        message: "A user with this username already exists.",
+      });
     }
     console.error(err);
     return res.status(500).json({ message: "Server error" });

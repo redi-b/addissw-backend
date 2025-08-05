@@ -6,7 +6,6 @@ import {
   UpdateSongSchema,
 } from "../validators/songValidator";
 import * as SongService from "../services/songService";
-import { Prisma } from "@prisma/client";
 import { AuthRequest } from "../middlewares/auth";
 
 // Create a new song
@@ -19,16 +18,14 @@ export async function createSong(req: AuthRequest, res: Response) {
     const data = CreateSongSchema.parse(req.body);
     const song = await SongService.createSong({ ...data, userId: req.user.id });
     return res.status(201).json(song);
-  } catch (err) {
+  } catch (err: any) {
     if (err instanceof z.ZodError) {
       return res.status(400).json({ message: err.message });
     }
-    if (err instanceof Prisma.PrismaClientKnownRequestError) {
-      if (err.code === "P2002") {
-        return res.status(409).json({
-          message: "A song with this title and artist already exists.",
-        });
-      }
+    if (err.name === "MongoServerError" && err.code === 11000) {
+      return res.status(409).json({
+        message: "A song with this title and artist already exists.",
+      });
     }
     console.error(err);
     return res.status(500).json({ message: "Server error" });
@@ -84,6 +81,7 @@ export async function updateSong(req: AuthRequest, res: Response) {
   if (!req.user) {
     return res.status(401).json({ message: "Unauthorized" });
   }
+  console.log("Updating song with ID:", req.params.id);
 
   try {
     const id = req.params.id;
