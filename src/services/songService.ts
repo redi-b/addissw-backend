@@ -165,7 +165,7 @@ export async function seedSongsIfEmpty(userId: string): Promise<number> {
 
 // ANALYTICS FUNCTIONS
 
-export async function getSongsPerArtist(userId: string) {
+export async function getSongsPerArtist(userId: string, limit = 10) {
   return await SongModel.aggregate([
     { $match: { userId: new Types.ObjectId(userId) } },
     {
@@ -182,10 +182,11 @@ export async function getSongsPerArtist(userId: string) {
       },
     },
     { $sort: { count: -1 } },
+    { $limit: limit },
   ]);
 }
 
-export async function getSongsPerYear(userId: string) {
+export async function getSongsPerYear(userId: string, limit = 10) {
   return await SongModel.aggregate([
     { $match: { userId: new Types.ObjectId(userId) } },
     {
@@ -202,10 +203,11 @@ export async function getSongsPerYear(userId: string) {
       },
     },
     { $sort: { _id: 1 } },
+    { $limit: limit },
   ]);
 }
 
-export async function getMonthlySongCreation(userId: string) {
+export async function getMonthlySongCreation(userId: string, limit = 12) {
   return await SongModel.aggregate([
     { $match: { userId: new Types.ObjectId(userId) } },
     {
@@ -226,6 +228,7 @@ export async function getMonthlySongCreation(userId: string) {
       },
     },
     { $sort: { "_id.year": 1, "_id.month": 1 } },
+    { $limit: limit },
   ]);
 }
 
@@ -245,7 +248,7 @@ export async function getTopAlbums(userId: string, limit = 5) {
         count: 1,
       },
     },
-    { $sort: { count: -1 } },
+    { $sort: { count: -1, album: 1 } },
     { $limit: limit },
   ]);
 }
