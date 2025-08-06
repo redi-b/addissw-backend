@@ -32,6 +32,6 @@ const songSchema = new Schema(
   }
 );
 
-songSchema.index({ title: 1, artist: 1 }, { unique: true });
+songSchema.index({ title: 1, artist: 1, userId: 1 }, { unique: true });
 
 export const Song = model("Song", songSchema);
