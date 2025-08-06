@@ -30,5 +30,5 @@ model Song {
   user   User   @relation(fields: [userId], references: [id])
   userId String @db.ObjectId
 
-  @@unique([title, artist])
+  @@unique([title, artist, userId])
 }
