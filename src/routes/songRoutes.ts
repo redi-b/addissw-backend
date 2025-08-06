@@ -27,6 +27,6 @@ router.put("/:id", authenticate, updateSong);
 router.delete("/:id", authenticate, deleteSong);
 
 // Seed songs if the database is empty
-router.post("/seed", authenticate, seedSongsIfEmpty)
+router.post("/seed", authenticate, seedSongsIfEmpty);
 
 export default router;

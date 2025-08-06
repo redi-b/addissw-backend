@@ -4,6 +4,7 @@ import dotenv from "dotenv";
 import cookieParser from "cookie-parser";
 
 import songRouter from "./routes/songRoutes";
+import analyticsRouter from "./routes/analyticsRoutes";
 import authRouter from "./routes/authRoutes";
 import { errorHandler } from "./middlewares/errors";
 import { connectToDatabase } from "./db";
@@ -24,6 +25,7 @@ app.use(express.json());
 
 app.use("/api/songs", songRouter);
 app.use("/api/auth", authRouter);
+app.use("/api/analytics", analyticsRouter);
 
 app.use(errorHandler);
 
@@ -39,4 +41,4 @@ const startServer = async () => {
   });
 };
 
-startServer()
+startServer();

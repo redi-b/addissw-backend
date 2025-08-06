@@ -158,9 +158,94 @@ export async function seedSongsIfEmpty(userId: string): Promise<number> {
   });
   if (existing > 0) return 0;
 
-  await SongModel.create(
-    seedData.map((song) => ({ ...song, userId }))
-  );
+  await SongModel.create(seedData.map((song) => ({ ...song, userId })));
 
   return seedData.length;
+}
+
+// ANALYTICS FUNCTIONS
+
+export async function getSongsPerArtist(userId: string) {
+  return await SongModel.aggregate([
+    { $match: { userId: new Types.ObjectId(userId) } },
+    {
+      $group: {
+        _id: "$artist",
+        count: { $sum: 1 },
+      },
+    },
+    {
+      $project: {
+        _id: 0,
+        artist: "$_id",
+        count: 1,
+      },
+    },
+    { $sort: { count: -1 } },
+  ]);
+}
+
+export async function getSongsPerYear(userId: string) {
+  return await SongModel.aggregate([
+    { $match: { userId: new Types.ObjectId(userId) } },
+    {
+      $group: {
+        _id: "$year",
+        count: { $sum: 1 },
+      },
+    },
+    {
+      $project: {
+        _id: 0,
+        year: "$_id",
+        count: 1,
+      },
+    },
+    { $sort: { _id: 1 } },
+  ]);
+}
+
+export async function getMonthlySongCreation(userId: string) {
+  return await SongModel.aggregate([
+    { $match: { userId: new Types.ObjectId(userId) } },
+    {
+      $group: {
+        _id: {
+          year: { $year: "$createdAt" },
+          month: { $month: "$createdAt" },
+        },
+        count: { $sum: 1 },
+      },
+    },
+    {
+      $project: {
+        _id: 0,
+        year: "$_id.year",
+        month: "$_id.month",
+        count: 1,
+      },
+    },
+    { $sort: { "_id.year": 1, "_id.month": 1 } },
+  ]);
+}
+
+export async function getTopAlbums(userId: string, limit = 5) {
+  return await SongModel.aggregate([
+    { $match: { userId: new Types.ObjectId(userId) } },
+    {
+      $group: {
+        _id: "$album",
+        count: { $sum: 1 },
+      },
+    },
+    {
+      $project: {
+        _id: 0,
+        album: "$_id",
+        count: 1,
+      },
+    },
+    { $sort: { count: -1 } },
+    { $limit: limit },
+  ]);
 }

@@ -58,7 +58,7 @@ export async function getSongById(req: AuthRequest, res: Response) {
   if (!req.user) {
     return res.status(401).json({ message: "Unauthorized" });
   }
-  
+
   try {
     const id = req.params.id;
     if (!id) return res.status(400).json({ message: "Invalid song ID" });
@@ -96,7 +96,8 @@ export async function updateSong(req: AuthRequest, res: Response) {
 
     const data = UpdateSongSchema.parse(req.body);
     const updated = await SongService.updateSong(id, data);
-    if (!updated) return res.status(500).json({ message: "Error updating song" });
+    if (!updated)
+      return res.status(500).json({ message: "Error updating song" });
 
     return res.json(updated);
   } catch (err) {
@@ -126,7 +127,8 @@ export async function deleteSong(req: AuthRequest, res: Response) {
     }
 
     const deleted = await SongService.deleteSong(id);
-    if (!deleted) return res.status(500).json({ message: "Error deleting song" });
+    if (!deleted)
+      return res.status(500).json({ message: "Error deleting song" });
 
     return res.json({ message: "Song deleted successfully" });
   } catch (err) {
@@ -139,7 +141,7 @@ export async function seedSongsIfEmpty(req: AuthRequest, res: Response) {
   if (!req.user) {
     return res.status(401).json({ message: "Unauthorized" });
   }
-  
+
   try {
     const seededCount = await SongService.seedSongsIfEmpty(req.user.id);
     if (seededCount === 0) {
@@ -151,5 +153,58 @@ export async function seedSongsIfEmpty(req: AuthRequest, res: Response) {
   } catch (err) {
     console.error(err);
     return res.status(500).json({ message: "Failed to seed songs." });
+  }
+}
+
+// Get number of songs per artist
+export async function getSongsPerArtist(req: AuthRequest, res: Response) {
+  if (!req.user) return res.status(401).json({ message: "Unauthorized" });
+
+  try {
+    const result = await SongService.getSongsPerArtist(req.user.id);
+    return res.json(result);
+  } catch (err) {
+    console.error(err);
+    return res.status(500).json({ message: "Server error" });
+  }
+}
+
+// Get number of songs per year
+export async function getSongsPerYear(req: AuthRequest, res: Response) {
+  if (!req.user) return res.status(401).json({ message: "Unauthorized" });
+
+  try {
+    const result = await SongService.getSongsPerYear(req.user.id);
+    return res.json(result);
+  } catch (err) {
+    console.error(err);
+    return res.status(500).json({ message: "Server error" });
+  }
+}
+
+// Get monthly song creation stats
+export async function getMonthlySongCreation(req: AuthRequest, res: Response) {
+  if (!req.user) return res.status(401).json({ message: "Unauthorized" });
+
+  try {
+    const result = await SongService.getMonthlySongCreation(req.user.id);
+    return res.json(result);
+  } catch (err) {
+    console.error(err);
+    return res.status(500).json({ message: "Server error" });
+  }
+}
+
+// Get top albums
+export async function getTopAlbums(req: AuthRequest, res: Response) {
+  if (!req.user) return res.status(401).json({ message: "Unauthorized" });
+
+  try {
+    const limit = Number(req.query.limit) || 5;
+    const result = await SongService.getTopAlbums(req.user.id, limit);
+    return res.json(result);
+  } catch (err) {
+    console.error(err);
+    return res.status(500).json({ message: "Server error" });
   }
 }
